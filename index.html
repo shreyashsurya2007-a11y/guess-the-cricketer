@@ -5,58 +5,78 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Guess the Output Game</title>
   <style>
+     /* Global fixes */
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
     body {
       font-family: Arial, sans-serif;
       background: #5801a3;
+      /* Use dynamic viewport height to avoid mobile address-bar jumps */
+      min-height: 100dvh;        /* modern mobile */
+      min-height: 100svh;        /* Safari alt */
+      /* fallback for older browsers */
+      min-height: 100vh;
+      padding: 16px;             /* breathing room on small screens */
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      -webkit-text-size-adjust: 100%; /* prevent iOS auto-resize */
     }
+
     .game-container {
-     background: linear-gradient(12deg, #667eea, #764ba2,rgb(232, 232, 90));
+      background: linear-gradient(12deg, #667eea, #764ba2, rgb(232, 232, 90));
+      width: 100%;
+      max-width: 520px;          /* cap width, but allow shrinking */
       padding: 20px;
       border-radius: 12px;
       box-shadow: 1px 16px 18px rgba(238, 7, 7, 0.2);
-      max-width: 500px;
       text-align: center;
-      cursor: pointer;
+    }
 
-    }
-    pre {
-      background: rgba(95, 100, 90,0.3);
-      color: rgb(0, 255, 179);
-      padding: 17px;
-      border-radius: 20px;
-      text-align: left;
-    }
-    .options button {
-      display: block ;
-      margin: 10px auto;
-      padding: 10px 90px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 16px;
-      background:linear-gradient( rgba(236, 236, 11),rgba(253, 63, 63, 0.6));
-      color: #000000c7;
-      transition: 0.3s;
-      border-style:solid;
-      border-width: 2px;
-      border-color: rgba(0, 255, 255,0);
-     
-    }
-    .options button:hover {
-      background: #e4e406;
-    }
-    #result {
-      font-weight: bold;
-      margin-top: 15px;
-    }
     .info {
       display: flex;
       justify-content: space-between;
       margin-bottom: 10px;
       font-weight: bold;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    pre {
+      background: rgba(95, 100, 90, 0.3);
+      color: rgb(0, 255, 179);
+      padding: 17px;
+      border-radius: 20px;
+      text-align: left;
+      margin: 0 0 12px;
+      /* wrap long lines so they don’t blow up width */
+      white-space: pre-wrap;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+    }
+
+    .options { display: grid; gap: 10px; }
+
+    .options button {
+      display: block;
+      width: 100%;               /* full width button for mobile */
+      max-width: 100%;
+      padding: 12px 16px;        /* responsive padding */
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      background: linear-gradient(#ecec0b, rgba(253, 63, 63, 0.6));
+      color: #000000c7;
+      transition: 0.2s transform ease, 0.2s background ease;
+      border: 2px solid rgba(0, 255, 255, 0);
+      touch-action: manipulation; /* avoid double-tap zoom delay */
+    }
+    .options button:hover { background: #e4e406; transform: translateY(-1px); }
+
+    #result {
+      font-weight: bold;
+      margin-top: 12px;
+      min-height: 24px; /* reserve space to prevent layout shift */
     }
 
   </style>
@@ -65,7 +85,7 @@
   <div class="game-container">
     <h2>Guess the Cricketer?</h2>
     <div class="info">
-      <span>Score: <span id="score"></span></span>
+      <span>Score: <span id="score">0</span></span>
       <span>Time: <span id="timer">90</span>s</span>
     </div>
     <pre id="codeSnippet"></pre>
@@ -136,15 +156,15 @@
       const q = questions[current];
       if (selected === q.answer) {
         document.getElementById("result").innerText = "✅ Correct!";
-        score += 10;
+        score+=10;
       } else {
-        document.getElementById("result").innerText = `❌ Wrong! Correct: ${q.answer}`;
+        document.getElementById("result").innerText = `❌ Wrong!`;
       }
       document.getElementById("score").innerText = score;
       setTimeout(() => {
         current++;
         loadQuestion();
-      }, 1500);
+      }, 900);
     }
 
     function endGame() {
